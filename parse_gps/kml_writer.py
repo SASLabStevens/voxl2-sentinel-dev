@@ -1,7 +1,7 @@
 '''
 Author: Cameron Ruddy 
 Data: 12/01/2024
-gmail: cruddy@research.Stevens.edu
+email: cruddy@research.Stevens.edu
 '''
 
 import csv
