@@ -26,7 +26,7 @@ def save_frame_and_data(frame, data, directory_timestamp, index, output_folder):
     directory_timestamp = datetime.fromisoformat(directory_timestamp.replace('Z', '+00:00'))
     formatted_directory_timestamp = directory_timestamp.strftime('%Y-%m-%d-%H-%M-%S')
 
-    new_base_name = f"siteRTX0002-camA003-{formatted_directory_timestamp}-{str(index).zfill(8)}"
+    new_base_name = f"siteRTX0002-camA014-{formatted_directory_timestamp}-{str(index).zfill(8)}"
     image_name = f"{new_base_name}.png"
     json_name = f"{new_base_name}.json"
     image_path = os.path.join(output_folder, image_name)
@@ -44,9 +44,9 @@ def save_frame_and_data(frame, data, directory_timestamp, index, output_folder):
             "lat": data['Latitude'],
             "lon": data['Longitude'],
             "alt": data['Altitude'],
-            "omega": data["heading"], 
-            "phi": data["tilt"],
-            "kappa": 0,
+            "omega": 0, 
+            "phi": data["tilt_rad"],
+            "kappa": data["heading_rad"],
         },
         "intrinsics": {
             "fx": 2376.5625,
@@ -90,13 +90,14 @@ def process_video_and_csv(video_path, csv_path, output_folder):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
     for index, row in enumerate(df.iterrows(), start=1):
-        directory_timestamp = row[1]['datetime']
-        video_time_sec = row[1]['Video Time (Sec)']
-        success, frame = get_frame_from_video(video_path, video_time_sec)
-        if success:
-            save_frame_and_data(frame, row[1].to_dict(), directory_timestamp, index, output_folder)
-        else:
-            print(f"Failed to extract frame at video time: {video_time_sec} seconds")
+        if index % 10 == 0:
+            directory_timestamp = row[1]['datetime']
+            video_time_sec = row[1]['Video Time (Sec)']
+            success, frame = get_frame_from_video(video_path, video_time_sec)
+            if success:
+                save_frame_and_data(frame, row[1].to_dict(), directory_timestamp, index, output_folder)
+            else:
+                print(f"Failed to extract frame at video time: {video_time_sec} seconds")
 
 
 if __name__ == "__main__":
